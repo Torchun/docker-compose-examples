@@ -1,0 +1,35 @@
+version: '3.2'
+services:
+    node-exporter:
+        # image: prom/node-exporter
+        image: harbor.difica/dockerhub-proxy/prom/node-exporter:v1.3.1
+        container_name: node-exporter
+        volumes:
+            - /proc:/host/proc:ro
+            - /sys:/host/sys:ro
+            - /:/rootfs:ro
+        command:
+            - --path.procfs=/host/proc
+            - --path.sysfs=/host/sys
+            - --collector.filesystem.ignored-mount-points
+            - ^/(sys|proc|dev|host|etc|rootfs/var/lib/docker/containers|rootfs/var/lib/docker/overlay2|rootfs/run/docker/netns|rootfs/var/lib/docker/aufs)($$|/)
+        ports:
+            - 9100:9100
+        restart: always
+        deploy:
+            mode: global
+    cadvisor:
+        # image: google/cadvisor
+        image: harbor.difica/dockerhub-proxy/google/cadvisor:v0.33.0
+        container_name: cadvisor
+        volumes:
+            - /:/rootfs:ro
+            - /var/run:/var/run:rw
+            - /sys:/sys:ro
+            - /var/lib/docker/:/var/lib/docker:ro
+        ports:
+            - 8081:8080
+        restart: always
+        deploy:
+            mode: global
+

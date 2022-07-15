@@ -1,0 +1,36 @@
+version: '3.2'
+services:
+    pgadmin:
+        container_name: pgadmin
+        # image: dpage/pgadmin4
+        image: harbor.difica/dockerhub-proxy/dpage/pgadmin4:6.5
+        environment:
+            PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL:-pgadmin@difica.com}
+            PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD:-password}
+            PGADMIN_CONFIG_SERVER_MODE: 'False'
+        volumes:
+            - /pgadmin:/root/.pgadmin
+        ports:
+#            - "${PGADMIN_PORT:-5050}:80"
+            - "${PGADMIN_PORT:-80}:80"
+        networks:
+            - postgres
+        restart: unless-stopped
+
+    postgres-exporter:
+        container_name: postgres-exporter
+        # image: bitnami/postgres-exporter:0.9.0
+        image: harbor.difica/dockerhub-proxy/bitnami/postgres-exporter:0.10.0
+        environment:
+            DATA_SOURCE_NAME: "postgresql://postgres:password@postgres.difica:5432/postgres?sslmode=disable"
+        ports:
+            - "9187:9187"
+        command:
+            - --auto-discover-databases
+#        depends_on:
+#            - postgres
+        restart: always
+
+networks:
+  postgres:
+    driver: bridge

@@ -1,0 +1,21 @@
+version: '2.4'
+
+services:
+  maps:
+    container_name: carto
+    image: harbor.difica/torchun/sverhoeven/cartodb:py3pg12postgis3
+    ports:
+      - "80:80"
+    environment:
+      CARTO_HOSTNAME: maps.difica
+    volumes:
+      # mkdir -p /carto/cartodb
+      # docker volume create --opt type=none --opt o=bind --opt device=/carto/cartodb cartodb 
+      - cartodb:/var/lib/postgresql
+    restart: always # necessary since it's failing to start sometimes
+
+volumes:
+  cartodb:
+    external: true
+
+

@@ -1,0 +1,36 @@
+version: '3.2'
+services:
+    prometheus:
+        # image: prom/prometheus:latest
+        image: harbor.difica/dockerhub-proxy/prom/prometheus:v2.33.4
+        container_name: prometheus
+        volumes:
+            - /prometheus/config:/etc/prometheus/
+            - /prometheus:/prometheus
+        command:
+            - --config.file=/etc/prometheus/prometheus.yml
+#            - --web.enable-admin-api
+        ports:
+            - 9090:9090
+#        links:
+#            - cadvisor:cadvisor
+#        depends_on:
+#            - cadvisor
+        restart: always
+
+    grafana:
+        # image: grafana/grafana
+        image: harbor.difica/dockerhub-proxy/grafana/grafana:8.4.1
+        user: "$UID:$GID"
+        container_name: grafana
+        depends_on:
+            - prometheus
+        ports:
+            - 3000:3000
+        volumes:
+            - /grafana:/var/lib/grafana
+            - /grafana/provisioning/:/etc/grafana/provisioning/
+        environment:
+            - GF_INSTALL_PLUGINS=grafana-worldmap-panel
+        restart: always
+
